@@ -9,5 +9,7 @@ import java.util.Optional;
 @Repository
 public interface HastaRepository extends JpaRepository<Hasta, Long> {
     Optional<Hasta> findByTcKimlikNo(String tcKimlikNo);
+    Hasta findByTcKimlikNoAndAdAndSoyad(String tcKimlikNo, String ad, String soyad);
+
 }
 

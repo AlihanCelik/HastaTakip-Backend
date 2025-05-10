@@ -36,6 +36,9 @@ public class HastaService {
     public void hastaSil(Long id) {
         hastaRepository.deleteById(id);
     }
+    public Hasta hastaBulByTcKimlikAndAdSoyad(String tcKimlik, String ad, String soyad) {
+        return hastaRepository.findByTcKimlikNoAndAdAndSoyad(tcKimlik, ad, soyad);
+    }
 
     public List<Hasta> tumHastalar() {
         return hastaRepository.findAll();

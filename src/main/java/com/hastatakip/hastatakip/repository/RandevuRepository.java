@@ -1,5 +1,6 @@
 package com.hastatakip.hastatakip.repository;
 
+import com.hastatakip.hastatakip.model.Hasta;
 import com.hastatakip.hastatakip.model.Randevu;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

@@ -16,7 +16,7 @@ public class Randevu {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "hasta_id")
+    @JoinColumn(name = "hasta_tc_kimlik_no", referencedColumnName = "tcKimlikNo")
     private Hasta hasta;
 
     @ManyToOne

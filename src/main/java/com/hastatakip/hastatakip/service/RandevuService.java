@@ -14,12 +14,24 @@ public class RandevuService {
     private RandevuRepository randevuRepository;
 
     public Randevu randevuEkle(Randevu randevu) {
+        List<Randevu> mevcutRandevular = randevuRepository.findByDoktorIdAndRandevuTarihi(randevu.getDoktor().getId(), randevu.getRandevuTarihi());
+        if (!mevcutRandevular.isEmpty()) {
+            throw new RuntimeException("Bu doktorun o tarihte randevusu var. Lütfen başka bir tarih seçin.");
+        }
+
         return randevuRepository.save(randevu);
     }
 
     public Randevu randevuGuncelle(Long id, Randevu randevu) {
         Randevu mevcutRandevu = randevuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Randevu bulunamadı"));
+        if (!mevcutRandevu.getRandevuTarihi().equals(randevu.getRandevuTarihi())) {
+            List<Randevu> mevcutRandevular = randevuRepository.findByDoktorIdAndRandevuTarihi(randevu.getDoktor().getId(), randevu.getRandevuTarihi());
+            if (!mevcutRandevular.isEmpty()) {
+                throw new RuntimeException("Bu doktorun o tarihte randevusu var. Lütfen başka bir tarih seçin.");
+            }
+        }
+
         mevcutRandevu.setRandevuTarihi(randevu.getRandevuTarihi());
         mevcutRandevu.setDurum(randevu.getDurum());
         return randevuRepository.save(mevcutRandevu);

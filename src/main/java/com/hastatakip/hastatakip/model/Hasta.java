@@ -1,9 +1,6 @@
 package com.hastatakip.hastatakip.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +16,10 @@ public class Hasta {
 
     private String ad;
     private String soyad;
+
+    @Column(unique = true, nullable = false) //...
     private String tcKimlikNo;
+
     private LocalDate dogumTarihi;
     private String cinsiyet;
     private String telefon;

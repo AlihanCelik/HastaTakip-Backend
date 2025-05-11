@@ -37,9 +37,9 @@ public class RandevuController {
         return new ResponseEntity<>(randevuService.tumRandevular(), HttpStatus.OK);
     }
 
-    @GetMapping("/hasta/{hastaId}")
-    public ResponseEntity<List<Randevu>> randevularByHasta(@PathVariable Long hastaId) {
-        return new ResponseEntity<>(randevuService.randevularByHasta(hastaId), HttpStatus.OK);
+    @GetMapping("/hasta/{tcKimlikNo}")
+    public ResponseEntity<List<Randevu>> randevularByHastaTc(@PathVariable String tcKimlikNo) {
+        return new ResponseEntity<>(randevuService.randevularByHastaTc(tcKimlikNo), HttpStatus.OK);
     }
 }
 

@@ -16,44 +16,36 @@ public class RandevuService {
     private RandevuRepository randevuRepository;
 
     @Autowired
-    private HastaService hastaService;  // Hasta servis sınıfını ekliyoruz
+    private HastaService hastaService;
 
-    // Randevu ekleme
     public Randevu randevuEkle(Randevu randevu) {
-        // Hasta kontrolü yapıyoruz (TC kimlik, ad, soyad)
         Hasta hasta = hastaService.hastaBulByTcKimlikAndAdSoyad(
                 randevu.getHasta().getTcKimlikNo(),
                 randevu.getHasta().getAd(),
                 randevu.getHasta().getSoyad()
         );
 
-        // Eğer hasta bulunamazsa hata ver
         if (hasta == null) {
             throw new RuntimeException("Hasta bulunamadı. Lütfen doğru bilgileri girin.");
         }
 
-        // Eğer hasta varsa, randevu ekleme işlemi devam eder
         List<Randevu> mevcutRandevular = randevuRepository.findByDoktorIdAndRandevuTarihi(randevu.getDoktor().getId(), randevu.getRandevuTarihi());
         if (!mevcutRandevular.isEmpty()) {
             throw new RuntimeException("Bu doktorun o tarihte randevusu var. Lütfen başka bir tarih seçin.");
         }
 
-        randevu.setHasta(hasta);  // Hastayı randevuya ekliyoruz
+        randevu.setHasta(hasta);
         return randevuRepository.save(randevu);
     }
 
-    // Randevu güncelleme
     public Randevu randevuGuncelle(Long id, Randevu randevu) {
-        // Randevuyu veritabanından alıyoruz
         Randevu mevcutRandevu = randevuRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Randevu bulunamadı"));
 
-        // Eğer hasta bilgileri değiştiyse, tekrar kontrol ediyoruz
         if (!mevcutRandevu.getHasta().getTcKimlikNo().equals(randevu.getHasta().getTcKimlikNo()) ||
                 !mevcutRandevu.getHasta().getAd().equalsIgnoreCase(randevu.getHasta().getAd()) ||
                 !mevcutRandevu.getHasta().getSoyad().equalsIgnoreCase(randevu.getHasta().getSoyad())) {
 
-            // Hasta kontrolü yapıyoruz (TC kimlik, ad, soyad)
             Hasta hasta = hastaService.hastaBulByTcKimlikAndAdSoyad(
                     randevu.getHasta().getTcKimlikNo(),
                     randevu.getHasta().getAd(),
@@ -63,10 +55,8 @@ public class RandevuService {
             if (hasta == null) {
                 throw new RuntimeException("Hasta bulunamadı. Lütfen doğru bilgileri girin.");
             }
-            mevcutRandevu.setHasta(hasta);  // Yeni hasta bilgilerini güncelliyoruz
+            mevcutRandevu.setHasta(hasta);
         }
-
-        // Tarih kontrolü
         if (!mevcutRandevu.getRandevuTarihi().equals(randevu.getRandevuTarihi())) {
             List<Randevu> mevcutRandevular = randevuRepository.findByDoktorIdAndRandevuTarihi(randevu.getDoktor().getId(), randevu.getRandevuTarihi());
             if (!mevcutRandevular.isEmpty()) {
@@ -88,8 +78,8 @@ public class RandevuService {
         return randevuRepository.findAll();
     }
 
-    public List<Randevu> randevularByHasta(Long hastaId) {
-        return randevuRepository.findByHastaId(hastaId);
+    public List<Randevu> randevularByHastaTc(String tcKimlikNo) {
+        return randevuRepository.findByHasta_TcKimlikNo(tcKimlikNo);
     }
 }
 

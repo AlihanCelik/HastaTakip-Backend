@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -17,29 +18,58 @@ public class RandevuController {
     private RandevuService randevuService;
 
     @PostMapping("/ekle")
-    public ResponseEntity<Randevu> randevuEkle(@RequestBody Randevu randevu) {
-        return new ResponseEntity<>(randevuService.randevuEkle(randevu), HttpStatus.CREATED);
+    public ResponseEntity<?> randevuEkle(@RequestBody Randevu randevu) {
+        try {
+            Randevu yeniRandevu = randevuService.randevuEkle(randevu);
+            return new ResponseEntity<>(yeniRandevu, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            // İş kurallarından kaynaklı hata (hasta bulunamadı, tarih dolu vb)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (SQLException e) {
+            // Veritabanı hatası
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
+        }
     }
 
     @PutMapping("/guncelle/{id}")
-    public ResponseEntity<Randevu> randevuGuncelle(@PathVariable Long id, @RequestBody Randevu randevu) {
-        return new ResponseEntity<>(randevuService.randevuGuncelle(id, randevu), HttpStatus.OK);
+    public ResponseEntity<?> randevuGuncelle(@PathVariable Long id, @RequestBody Randevu randevu) {
+        try {
+            Randevu guncellenmis = randevuService.randevuGuncelle(id, randevu);
+            return new ResponseEntity<>(guncellenmis, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/sil/{id}")
-    public ResponseEntity<Void> randevuSil(@PathVariable Long id) {
-        randevuService.randevuSil(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> randevuSil(@PathVariable Long id) {
+        try {
+            randevuService.randevuSil(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
+        }
     }
 
     @GetMapping("/tumRandevular")
-    public ResponseEntity<List<Randevu>> tumRandevular() {
-        return new ResponseEntity<>(randevuService.tumRandevular(), HttpStatus.OK);
+    public ResponseEntity<?> tumRandevular() {
+        try {
+            List<Randevu> list = randevuService.tumRandevular();
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
+        }
     }
 
     @GetMapping("/hasta/{tcKimlikNo}")
-    public ResponseEntity<List<Randevu>> randevularByHastaTc(@PathVariable String tcKimlikNo) {
-        return new ResponseEntity<>(randevuService.randevularByHastaTc(tcKimlikNo), HttpStatus.OK);
+    public ResponseEntity<?> randevularByHastaTc(@PathVariable String tcKimlikNo) {
+        try {
+            List<Randevu> list = randevuService.randevularByHastaTc(tcKimlikNo);
+            return new ResponseEntity<>(list, HttpStatus.OK);
+        } catch (SQLException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
+        }
     }
 }
-

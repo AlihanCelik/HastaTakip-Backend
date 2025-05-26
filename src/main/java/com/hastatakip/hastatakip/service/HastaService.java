@@ -76,22 +76,20 @@ public class HastaService {
         return null;
     }
 
-    public List<Hasta> hastaByTcKimlikAndAdSoyad(String tcKimlikNo, String ad, String soyad) throws SQLException {
-        List<Hasta> hastaList = new ArrayList<>();
-        String sql = "SELECT * FROM hasta WHERE tc_kimlik_no=? AND ad=? AND soyad=?";
+    public Hasta hastaByTcKimlikNo(String tcKimlikNo) throws SQLException {
+        String sql = "SELECT * FROM hasta WHERE tc_kimlik_no=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, tcKimlikNo);
-            stmt.setString(2, ad);
-            stmt.setString(3, soyad);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    hastaList.add(mapRow(rs));
+                if (rs.next()) {
+                    return mapRow(rs);
                 }
             }
         }
-        return hastaList;
+        return null;
     }
+
 
     public List<Hasta> tumHastalar() throws SQLException {
         List<Hasta> hastaList = new ArrayList<>();

@@ -23,10 +23,8 @@ public class RandevuController {
             Randevu yeniRandevu = randevuService.randevuEkle(randevu);
             return new ResponseEntity<>(yeniRandevu, HttpStatus.CREATED);
         } catch (RuntimeException e) {
-            // İş kurallarından kaynaklı hata (hasta bulunamadı, tarih dolu vb)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (SQLException e) {
-            // Veritabanı hatası
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Veritabanı hatası: " + e.getMessage());
         }
     }

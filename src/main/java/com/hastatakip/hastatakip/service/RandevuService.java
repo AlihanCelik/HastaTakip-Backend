@@ -29,7 +29,6 @@ public class RandevuService {
             throw new RuntimeException("Hasta bulunamadı. Lütfen doğru TC Kimlik No girin.");
         }
 
-        // Aynı doktor ve tarihte randevu var mı kontrol et
         if (randevuVarMi(randevu.getDoktor().getId(), randevu.getRandevuTarihi())) {
             throw new RuntimeException("Bu doktorun o tarihte randevusu var. Lütfen başka bir tarih seçin.");
         }
@@ -58,20 +57,17 @@ public class RandevuService {
             }
         }
 
-        // Hasta nesnesini güncelle
         randevu.setHasta(hasta);
 
         return randevu;
     }
 
     public Randevu randevuGuncelle(Long id, Randevu randevu) throws SQLException {
-        // Var olan randevuyu getir
         Randevu mevcut = randevuById(id);
         if (mevcut == null) {
             throw new RuntimeException("Randevu bulunamadı");
         }
 
-        // Hasta değiştiyse hasta bilgisini güncelle
         if (!mevcut.getHasta().getTcKimlikNo().equals(randevu.getHasta().getTcKimlikNo())) {
             Hasta hasta = hastaService.hastaByTcKimlikNo(randevu.getHasta().getTcKimlikNo());
             if (hasta == null) {
@@ -80,13 +76,11 @@ public class RandevuService {
             mevcut.setHasta(hasta);
         }
 
-        // Tarih değiştiyse aynı doktorun o tarihte başka randevusu var mı kontrol et
         if (!mevcut.getRandevuTarihi().equals(randevu.getRandevuTarihi()) &&
                 randevuVarMi(randevu.getDoktor().getId(), randevu.getRandevuTarihi())) {
             throw new RuntimeException("Bu doktorun o tarihte randevusu var. Lütfen başka bir tarih seçin.");
         }
 
-        // Güncelleme sorgusu
         String sql = "UPDATE randevu SET doktor_id=?, hasta_id=?, randevu_tarihi=?, durum=? WHERE id=?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -161,7 +155,6 @@ public class RandevuService {
         return null;
     }
 
-    // Aynı doktor ve tarihte randevu var mı?
     private boolean randevuVarMi(Long doktorId, java.time.LocalDateTime tarih) throws SQLException {
         String sql = "SELECT COUNT(*) FROM randevu WHERE doktor_id=? AND randevu_tarihi=?";
         try (Connection connection = dataSource.getConnection();
@@ -181,12 +174,10 @@ public class RandevuService {
         Randevu randevu = new Randevu();
         randevu.setId(rs.getLong("id"));
 
-        // Hasta TC Kimlik No'sunu al ve hasta nesnesini getir
         String hastaTc = rs.getString("hasta_tc_kimlik_no");
         Hasta hasta = hastaService.hastaByTcKimlikNo(hastaTc);
         randevu.setHasta(hasta);
 
-        // Doktor ID'yi al ve doktor nesnesini getir
         Long doktorId = rs.getLong("doktor_id");
         Doktor doktor = doktorService.doktorById(doktorId); // DoktorService içinde bu metot olmalı
         randevu.setDoktor(doktor);
